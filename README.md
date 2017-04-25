@@ -6,7 +6,7 @@ These cases are denoted as choice variable:
 #### If choice = 0:
 Solve the problem where outlier constraints are relaxed and kinship constraints are satisfied. (This is linear integer programming problem). Also minimize slack variables (quantity of being outliers.)
 #### If choice = 1:
-Solution is based on relaxing kinship constraints and satisfying outlier constraints. It generates constraints to find optimal phi value. (This is a non-linear constrained integer problem). These constraints are used in Matlab (ga_lp2.m)
+Solution is based on relaxing kinship constraints and satisfying outlier constraints. It generates constraints to find optimal phi value. (This is a non-linear constrained integer problem). These constraints are used in Matlab (See https://github.com/tastanlab/Kinship-Privacy/blob/master/README.md#solution-for-choice--1)
 #### If choice = 2:
 Solve the original problem by replacing optimal phi value found in the previous step. (This is linear integer programming problem). 
 ## Solution for choice = 1
