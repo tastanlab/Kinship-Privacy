@@ -10,7 +10,7 @@ library(Rcplex)
 ### choice = 0 : Solution for the model where outlier constraints are relaxed and kinship constraints are satisfied.
 ### choice = 1 : Creates outlier and kinship constraints to solve model where kinship constraints are relaxed. (This constraint matrix is used by Matlab to find minimum Phi value that satisfies created constraints. 
 #Matlab is used because Rcplex do not solve nonlinear constrainted integer programming problems.)
-### choice = 2 : Solution for the model where kinship constraints are relaxed. It replaces phi value obtained from the original problem. (Phi is solved by Matlab using parameters that is obtained from choice = 1).
+### choice = 2 : Solution for the model where kinship constraints are relaxed. It replaces phi value obtained to the original problem. (Phi is solved by Matlab using parameters that is obtained from choice = 1).
 
 args = commandArgs(trailingOnly=TRUE)
 choice <- as.numeric(args[1])
@@ -237,7 +237,6 @@ if(dim(relations)[1]>=2)
     other_matrix <- rbind(other_matrix, o_row)
     RHS2 <- rbind(RHS2,n_x)
     
-    # if choice = 0
     if(choice==0)
     {
       for(index1 in 1:(number_of_people-1))
@@ -300,7 +299,7 @@ if(dim(relations)[1]>=2)
         }
         
       }
-    }else 
+    }else
     {
       for(index1 in 1:(number_of_people-1))
       {
@@ -461,7 +460,6 @@ if(dim(relations)[1]>=2)
       print("n12 < o12")
     }
     
-    #Solve the model for choice = 2 
     if(choice == 2  & flag_10 == FALSE & flag_11 == FALSE & flag_12 == FALSE)
     {
       
@@ -470,6 +468,7 @@ if(dim(relations)[1]>=2)
       bvec <- c(RHS_x11, n11-o11)
       res<-Rcplex(c(1), Amat, bvec, Qmat = NULL, control=list(solnpoolintensity=4),
                   objsense = c("min"), sense = c("G","L"), vtype = c("I"), n=500)
+      
       
       
       pos_11 <- snp.pos[sample(which(genotype[,1]==1 & genotype[,2] ==1 ))]
@@ -504,3 +503,140 @@ if(dim(relations)[1]>=2)
 
 
 
+
+
+
+#write the constraints to a txt file so matlab code can use it.
+if(choice==1 & length(files) > 2)
+{
+  new_size_matrix <- c()
+  for(index in 1:dim(X_general)[1])
+  {
+    new_size_matrix<- c(new_size_matrix,min(RHS2[which(other_matrix[,index]==1)]))
+  }
+  write.table(new_size_matrix,"size_constraints.txt",col.names = FALSE, row.names = FALSE)  
+  write.table(df,"kin_constraints.txt",col.names = FALSE, row.names = FALSE)
+  if(flag_10 < 0 | flag_11 < 0 | flag_12 < 0)
+  {
+    write.table(matrix(c("n10 < o10", flag_10,"n11 < o11", flag_11, "n12 < o12", flag_12), ncol = 2, byrow = TRUE),"flag_constraints.txt", sep = "\t", col.names = FALSE, row.names = FALSE) 
+  }
+}
+
+
+# Solve the model which minimizes the number of hidden snps where optimal phi value is already found by matlab and calculated constraints previously. 
+if(choice==2 & length(files) > 2)
+{
+  
+  new_size_matrix <- c()
+  for(index in 1:dim(X_general)[1])
+  {
+    new_size_matrix<- c(new_size_matrix,min(RHS2[which(other_matrix[,index]==1)]))
+  }
+  
+  Amat <- rbind(Amat, diag(1,dim(X_general)[1],dim(X_general)[1]))
+  bvec<-c(bvec,new_size_matrix)
+  
+  sense_vec<- c(rep("G", dim(relations)[1]), rep("L",length(new_size_matrix)))
+  flag_minus <- FALSE
+  minus_ind <- c()
+  for( abc in 1:length(bvec))
+  {
+    if(bvec[abc] < 0)
+    {
+      flag_minus <- TRUE
+      minus_ind <- c(abc, minus_ind)
+    }
+  }
+  
+  if(flag_minus == TRUE)
+  {
+    Amat[minus_ind,] <- -(Amat[minus_ind,])
+    bvec[minus_ind] <- -bvec[minus_ind]
+    sense_vec[minus_ind] <- "L"
+  }
+  
+  cvec <- c(rep(1,nrow(X_general)))
+  res<-Rcplex(cvec, Amat, bvec, Qmat = NULL, control=list(solnpoolintensity=4),
+              objsense = c("min"), sense = sense_vec, vtype = rep("I",length(cvec)), n=500)
+  print(res[[1]])
+  
+  
+  remove_snps<-c()
+  if(length(res)>0)
+  {
+    for(row_ind in 1:dim(X_general)[1])
+    {
+      snp_position <- snp.pos[which(apply(genotype,1, function(x) all.equal(x,X_general[row_ind,])) == "TRUE")]
+      snp_position <- sample(snp_position)
+      snp_position <- snp_position[1:(res[[1]]$xopt[row_ind])]
+      remove_snps <- c(remove_snps, snp_position)
+    }
+    write.table(remove_snps, "hide_snps.txt", row.names = FALSE, col.names = FALSE, quote = FALSE, append = FALSE)
+  }else
+  {
+    print("there is no solution!")  
+  }
+  
+}
+
+
+if (choice ==0 & length(files) > 2) {
+  vec<-duplicated(other_matrix)
+  duplic_rows <- other_matrix[vec,]
+  
+  if(!(is.null(duplic_rows)))
+  {
+    row_ind <- rowmatch2(duplic_rows, other_matrix )
+    unik <- na.omit(unique(row_ind))
+    
+    for (k in 1:length(unik))
+    {
+      row_ind <- rowmatch2(duplic_rows, other_matrix )
+      unique_indices <- na.omit(unique(row_ind))
+      ind_array <- which(row_ind==unique_indices[k])
+      new_rhs_value <- min(RHS2[(ind_array)])
+      other_matrix <- other_matrix[-ind_array[2:length(ind_array)],]
+      RHS2 <- RHS2[-ind_array[2:length(ind_array)]]
+      RHS2[ind_array[1]] <- new_rhs_value
+    }
+  } 
+  Amat<-cbind(Amat,matrix(0,nrow = nrow(Amat), ncol=3))
+  Amat <-rbind(Amat,other_matrix)
+  
+  bvec<-c(bvec,t(RHS2))
+  
+  #minimize the number of snps to be hidden 
+  cvec <- c(rep(1,nrow(X_general)),0,0,0) #objective
+  res<-Rcplex(cvec, Amat, bvec, Qmat = NULL, control=list(solnpoolintensity = 4),
+              objsense = c("min"), sense = c(rep("G", nrow(relations) ), rep("L",dim(Amat)[1]-nrow(relations))), vtype = rep("I",length(cvec)), n =100)
+
+  #take the first solution and write it as another constraint i.e. x101+x111+x121 = 4000. Then solve the problem to find minimum number of e1+e2+e3. (Find minimum outlier leakege)
+  
+  #minimize e1 + e2 + e3 slack variables
+  Amat_yeni <- rbind(Amat, c(rep(1,nrow(X_general)),0,0,0))
+  bvec_yeni <- c(bvec, res[[1]]$obj)
+  cvec_yeni <- c(rep(0,nrow(X_general)),1,1,1)
+  res2 <- Rcplex(cvec_yeni,Amat_yeni, bvec_yeni, Qmat = NULL, control=list(solnpoolintensity=4),
+                 objsense = c("min"), sense = c(rep("G", nrow(relations) ), rep("L",length(RHS2)), "E"), vtype = rep("I",length(cvec)), n=100)
+  
+  if(length(res)==0 | length(res2)==0)
+  {
+    print("no solut??on ex??st")
+  }else
+  {
+    write.table(res2[[1]]$xopt, "out.txt")
+    #removal of snps
+    remove_snps <-c()
+    for(row_ind in 1:dim(X_general)[1])
+    {
+      snp_position <- snp.pos[which(apply(genotype,1, function(x) all.equal(x,X_general[row_ind,])) == "TRUE")]
+      snp_position <- sample(snp_position)
+      snp_position <- snp_position[1:(res2[[1]]$xopt[row_ind])]
+      remove_snps <- c(remove_snps, snp_position)
+    }
+    
+    write.table(remove_snps,"hide_snps.txt", row.names = FALSE, col.names = FALSE, quote = FALSE, append = FALSE) 
+  }
+  
+  
+}
