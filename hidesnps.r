@@ -1,5 +1,6 @@
 library(methods)
 source('functions.r')
+source("relationship_matrix_generator.r")
 library(gdsfmt)
 library(SNPRelate)
 library(Rcplex)
@@ -46,6 +47,7 @@ flag_12 <- FALSE
 
 
 ## Define relationship matrices in the family by reading VCF files (of existing and incoming members in the family). ###
+genotype <- relationship_matrix()
 
 
 
