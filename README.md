@@ -1,5 +1,5 @@
 ## Hierarchical Clustering
-hierclustering_opensnp.r applies hierchical clustering on opensnp data (VCF format). (See [SNPrelate](http://corearray.sourceforge.net/tutorials/SNPRelate/)
+hierclustering_opensnp.r applies hierchical clustering on opensnp data (VCF format). (See [SNPRelate](http://corearray.sourceforge.net/tutorials/SNPRelate/)
 ## Hiding SNPs 
 hide_snps code generates kinship and outlier constraints. It can solve the optimization model if outlier constraints are relaxed.  If kinship constraints are relaxed, those constraints become non-linear. Unfortunately, Rcplex cannot solve non-linear constrainted integer programming problems, so this R code only generates the constraints and writes to txt files and then ga_lp2.m code is used to find minimum phi value that satisfies given non-linear constraints. We replace the optimal phi value into non_linear kinship constraints and make them linear. When the problem becomes linear with found phi value, we can solve original problem in Rcplex.
 These cases are denoted as choice variable:
