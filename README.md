@@ -9,5 +9,5 @@ Solve the problem where outlier constraints are relaxed and kinship constraints 
 Solution is based on relaxing kinship constraints and satisfying outlier constraints. It generates constraints to find optimal phi value. (This is a non-linear constrained integer problem). These constraints are used in Matlab (See [Solution for choice = 1](https://github.com/tastanlab/Kinship-Privacy/blob/master/README.md#solution-for-choice--1)
 #### If choice = 2:
 Solve the original problem by replacing optimal phi value found in the previous step. (This is linear integer programming problem). 
-## Solution for choice = 1
+### Solution for choice = 1
 ga_lp2.m solves the optimization model with non-linear constraints. The objective function is phi (the minimum kinship value that protects privacy of a family by satisfying outlier constraints.) 
