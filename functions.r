@@ -8,9 +8,7 @@ get_relatedX <- function(X_general , rel)
     p2<-pairs[p,2]
     ind <- which(X_general[,rel[1]]==p1 & X_general[,rel[2]]==p2, arr.ind=TRUE);
     related_X_indices<- c(ind,related_X_indices);
-    
   }
-  
   return(related_X_indices)
 }
 
@@ -25,10 +23,8 @@ compMat2 <- function(A, B) {  # rows of B present in A
   
   AB <- rbind(A, B0) 
   ab <- duplicated(AB)[(na+1):(na+nb)] 
-  
   return(ab) 
 } 
-
 
 rowmatch <- function(x, want) {
   isTRUE(all.equal(x, want))
