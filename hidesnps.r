@@ -22,7 +22,6 @@ if(choice==0)
   o12 <- as.numeric(args[4])
   #which family is evaluated:
   family <- as.numeric(args[5])
-  
 }else if(choice == 1)
 {
   phi <- 0 
@@ -40,20 +39,15 @@ if(choice==0)
   o12 <- 15019
   family <- as.numeric(args[1])
 }
-
-
-
-
+#read the genotype information of family members
 files<-list.files(path=getwd(),pattern=".vcf")
-
-
 genof <- snpgdsOpen("c.gds")
 g <- read.gdsn(index.gdsn(genof, "genotype"))
 snp.id <- read.gdsn(index.gdsn(genof, "snp.id"))
 snp.position <- read.gdsn(index.gdsn(genof, "snp.position"))
 snp.chromosome <- read.gdsn(index.gdsn(genof, "snp.chromosome"))
 
-
+#Calculate Kinship Coefficients
 ibd.robust <- snpgdsIBDKING(genof, sample.id=1:length(files), family.id=NULL)
 snp.id<-ibd.robust$snp.id
 genotype<-g[snp.id,]
@@ -72,18 +66,16 @@ flag_12 <- FALSE
 # If there are more than 2 relationships:
 if(dim(relations)[1]>=2)
 { 
-  removal_index <- 1 # kimden silineceginin indexi her zaman 1
+  removal_index <- 1 # snps will be hidden from always first person (latest added family member).
   arr <- which(relations == removal_index, arr.ind = TRUE)
   
-  #constraints  
+  #Relatives of latest added member
   removal_rel <- relations[arr[,1],]
   
   # Create X matrix
-  
   number_of_people<-length(files) # number of people in family
   indices<-1:number_of_people
   X_general <- c()
-  
   
   if (is.null(nrow(removal_rel)))
   {
@@ -133,7 +125,6 @@ if(dim(relations)[1]>=2)
     j<-rel[2]
     g1<-length(which(genotype[,i]==1,arr.ind=TRUE))
     g2<-length(which(genotype[,j]==1, arr.ind=TRUE))
-    
     d <- length(which(genotype[,i]==1 & genotype[,j]==1, arr.ind=TRUE))
     c <- length(which(genotype[,i]==2 & genotype[,j]==0, arr.ind=TRUE)) + length(which(genotype[,i]==0 & genotype[,j]==2, arr.ind=TRUE))
     
@@ -141,7 +132,7 @@ if(dim(relations)[1]>=2)
     {
       b<-g2
       a<-g1
-    }  else
+    }else
     {
       b<-g1
       a<-g2
@@ -200,7 +191,7 @@ if(dim(relations)[1]>=2)
     Amat <- rbind(Amat,t(obj_arr))
   }
   
-  if(choice ==1)
+  if(choice == 1)
   {
     df <-data.frame( ncol=2*nrow(X_general) +2 )
     df <- cbind(Amat,phi_x_array, t(t(bvec)), t(t(phi_rhs)))
@@ -245,7 +236,6 @@ if(dim(relations)[1]>=2)
         {
           if(!is.na(rowmatch(relations,matrix(, data = c(index1,index2), ncol = 2))))
           {
-            
             if(x[index1]==1 & x[index2]==1)
             {
               n11 <- length(which(genotype[,index1]==1 & genotype[,index2]==1, arr.ind = TRUE))
@@ -260,7 +250,6 @@ if(dim(relations)[1]>=2)
                 new_rhs <- 0
               }
               RHS2 <-rbind(RHS2,new_rhs)
-              
             }
             if((x[index1]==1 & x[index2]==0) || (x[index1]==0 & x[index2]==1))
             {
@@ -274,9 +263,7 @@ if(dim(relations)[1]>=2)
               {
                 new_rhs <- 0
               }
-              
               RHS2 <-rbind(RHS2,new_rhs)
-              
             }
             if((x[index1]==1 & x[index2]==2) || (x[index1]==2 & x[index2]==1))
             {
@@ -294,10 +281,7 @@ if(dim(relations)[1]>=2)
               RHS2 <-rbind(RHS2,new_rhs)
             }
           }
-          
-          
         }
-        
       }
     }else
     {
@@ -324,7 +308,6 @@ if(dim(relations)[1]>=2)
                 new_rhs <- 0
               }
               RHS2 <- rbind(RHS2,new_rhs) 
-              
             }
             #constraints where index1 and index2 user have 1 or 0 snp values
             if((x[index1]==1 & x[index2]==0) || (x[index1]==0 & x[index2]==1))
@@ -341,7 +324,6 @@ if(dim(relations)[1]>=2)
                 new_rhs <- 0
               }
               RHS2 <- rbind(RHS2,(new_rhs))
-              
             }
             #constraints for where index1 and index2 user have 1 or 2 snp values
             if((x[index1]==1 & x[index2]==2) || (x[index1]==2 & x[index2]==1))
@@ -357,18 +339,12 @@ if(dim(relations)[1]>=2)
                 print("n12 < o12")
                 new_rhs <- 0
               }
-              RHS2 <- rbind(RHS2,new_rhs)
-              
+              RHS2 <- rbind(RHS2,new_rhs) 
             }
-            
           }
-          
         }
-        
       }
-      
     }
-    
   }
 }else # Only one kinship relationship exist no need to calculate X_general. Only x11 is considered.
 {
@@ -376,7 +352,6 @@ if(dim(relations)[1]>=2)
   j<-relations[2]
   g1<-length(which(genotype[,i]==1,arr.ind=TRUE))
   g2<-length(which(genotype[,j]==1, arr.ind=TRUE))
-  
   d <- length(which(genotype[,i]==1 & genotype[,j]==1, arr.ind=TRUE))
   c <- length(which(genotype[,i]==2 & genotype[,j]==0, arr.ind=TRUE)) + length(which(genotype[,i]==0 & genotype[,j]==2, arr.ind=TRUE))
   
@@ -394,18 +369,18 @@ if(dim(relations)[1]>=2)
   {
     phi<-0
     RHS <- (2*d - 4*c -a + b - 4*b*phi)/2;
-    
     gen_11 <- which(genotype[,1]==1 & genotype[,2]==1)
     gen_10 <- which(genotype[,1]==1 & genotype[,2]==0)
     gen_12 <- which(genotype[,1]==1 & genotype[,2]==2)
-    Amat <- rbind(c(1,0),c(1,-1))
-    bvec <- c(RHS, length(gen_11)-o11)
-    cvec <- c(1,0)
+    #find minimum number of snps to be hidden 
+    Amat <- rbind(c(1,0),c(1,-1)) #constraints
+    bvec <- c(RHS, length(gen_11)-o11) #Right handside
+    cvec <- c(1,0) #objective function
     res<-Rcplex(cvec, Amat, bvec, Qmat = NULL, control=list(solnpoolintensity=4),
                 objsense = c("min"), sense = c("G", "L"), vtype = rep("I",length(cvec)), n=1000)
-    
-    Amat2 <- rbind(c(1,0),c(1,-1),c(1,0))
-    bvec2 <- c(RHS, length(gen_11)-o11,res[[1]]$obj)
+    #find minimum number of slack variables
+    Amat2 <- rbind(c(1,0),c(1,-1),c(1,0)) #additional constraint is taken from the previous model's solution: x11 = res[[1]]$obj
+    bvec2 <- c(RHS, length(gen_11)-o11,res[[1]]$obj) 
     cvec2 <- c(0,1)
     res2<-Rcplex(cvec2, Amat2, bvec2, Qmat = NULL, control=list(solnpoolintensity=4),
                  objsense = c("min"), sense = c("G", "L","E"), vtype = rep("I",length(cvec)), n=1000)
@@ -416,7 +391,6 @@ if(dim(relations)[1]>=2)
     {
       e10 <- o10 - length(gen_10)
     }
-    
     if(length(gen_12)-o12 < 0)
     {
       e12 <- o12 - length(gen_12)
@@ -433,10 +407,7 @@ if(dim(relations)[1]>=2)
     snp_pos11 <- snp.pos[ which(genotype[,1]==1 & genotype[,2]==1) ]
     snp_pos11 <- sample(snp_pos11)
     snp_pos11 <- snp_pos11[1:x11]
-    
     write.table(snp_pos11, "hide_snps.txt", row.names = FALSE, col.names = FALSE, quote = FALSE, append = FALSE)
-    
-    
   }else  ## kinship is relaxed
   {
     n10 <- length(which(genotype[,1]==1 & genotype[,2]==0, arr.ind = TRUE))
@@ -447,7 +418,7 @@ if(dim(relations)[1]>=2)
       flag_10 <- n10 - o10
       print("n10 < o10")
     }
-    
+ 
     if(n11 < o11)
     {
       flag_11 <-n11 - o11
@@ -461,22 +432,17 @@ if(dim(relations)[1]>=2)
     }
     
     if(choice == 2  & flag_10 == FALSE & flag_11 == FALSE & flag_12 == FALSE)
-    {
-      
+    {     
       RHS_x11 <- (2*d-4*c-a+b-4*b*phi)/(2*(1-2*phi))
       Amat<-matrix(c(1,1), nrow = 2)
       bvec <- c(RHS_x11, n11-o11)
       res<-Rcplex(c(1), Amat, bvec, Qmat = NULL, control=list(solnpoolintensity=4),
-                  objsense = c("min"), sense = c("G","L"), vtype = c("I"), n=500)
-      
-      
-      
+                  objsense = c("min"), sense = c("G","L"), vtype = c("I"), n=500) 
+   
+      #take the positions of snps to be hidden
       pos_11 <- snp.pos[sample(which(genotype[,1]==1 & genotype[,2] ==1 ))]
-      
-      snp.pos_11 <-pos_11[1:res[[1]]$obj[1]]
-      
+      snp.pos_11 <-pos_11[1:res[[1]]$obj[1]]  
       write.table(snp.pos_11,"hide_snps.txt", row.names = FALSE, col.names = FALSE, quote = FALSE, append = FALSE) 
-      
     }else if(choice == 1 ) #only generate constraints for matlab to solve nonlinear model.
     {
       if ( flag_10 < 0 | flag_11 < 0 | flag_12 < 0 )
@@ -500,10 +466,6 @@ if(dim(relations)[1]>=2)
     }
   } 
 }
-
-
-
-
 
 
 #write the constraints to a txt file so matlab code can use it.
@@ -578,8 +540,7 @@ if(choice==2 & length(files) > 2)
   }
   
 }
-
-
+                                          
 if (choice ==0 & length(files) > 2) {
   vec<-duplicated(other_matrix)
   duplic_rows <- other_matrix[vec,]
@@ -633,10 +594,7 @@ if (choice ==0 & length(files) > 2) {
       snp_position <- sample(snp_position)
       snp_position <- snp_position[1:(res2[[1]]$xopt[row_ind])]
       remove_snps <- c(remove_snps, snp_position)
-    }
-    
+    }    
     write.table(remove_snps,"hide_snps.txt", row.names = FALSE, col.names = FALSE, quote = FALSE, append = FALSE) 
   }
-  
-  
 }
