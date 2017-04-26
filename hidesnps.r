@@ -5,7 +5,6 @@ library(gdsfmt)
 library(SNPRelate)
 library(Rcplex)
 
-
 #Input parameters. The first parameter is choice:
 ### choice = 0 : Solution for the model where outlier constraints are relaxed and kinship constraints are satisfied.
 ### choice = 1 : Creates outlier and kinship constraints to solve model where kinship constraints are relaxed. (This constraint matrix is used by Matlab to find minimum Phi value that satisfies created constraints. 
@@ -137,6 +136,7 @@ if(dim(relations)[1]>=2)
       b<-g1
       a<-g2
     } # if choice = 0 or 1 Phi=0.
+    
     if(choice <= 1)
     {
       phi<-0
@@ -149,20 +149,16 @@ if(dim(relations)[1]>=2)
     }
     
     bvec<- c(bvec,RHS)
-    
     related_X_indices <- get_relatedX(X_general, rel)
     related_X_indices <- sort(related_X_indices)
     related_x <- X_general[related_X_indices,]
-    
     obj_arr<-matrix(0,nrow = nrow(X_general), ncol = 1, byrow = TRUE)
-    phi_arr <- matrix(0,nrow = nrow(X_general), ncol = 1, byrow = TRUE)
-    
+    phi_arr <- matrix(0,nrow = nrow(X_general), ncol = 1, byrow = TRUE)  
+    #these are calculated based on KING coefficient:
     x_11 <- which(related_x[,i] == 1 & related_x[,j]==1 , arr.ind = TRUE)
     x_20 <- c( which(related_x[,i] == 2 & related_x[,j]==0 , arr.ind = TRUE), which(related_x[,i] == 0 & related_x[,j]==2, arr.ind = TRUE))
-    
     p <- which(compMat2(related_x[x_11,],X_general))
     q <- which(compMat2(related_x[x_20,],X_general))
-    
     obj_arr[p] <- obj_arr[p] + 2
     obj_arr[q] <- obj_arr[q] - 4
     
@@ -175,7 +171,7 @@ if(dim(relations)[1]>=2)
       s <- which(compMat2(related_x[x__1,],X_general))
       t <- which(compMat2(related_x[x_1,],X_general))
       
-    } else
+    }else
     {
       x_1 <-which(related_x[,j] == 1, arr.ind = TRUE) #a
       x__1 <-which(related_x[,i] == 1, arr.ind = TRUE) #b
@@ -185,10 +181,9 @@ if(dim(relations)[1]>=2)
     
     obj_arr[t] <- obj_arr[t] - 1;
     obj_arr[s] <- obj_arr[s] + (1 - 4*phi); 
-    
     phi_arr[s]<- -4
     phi_x_array<-rbind(phi_x_array, t(phi_arr))
-    Amat <- rbind(Amat,t(obj_arr))
+    Amat <- rbind(Amat,t(obj_arr)) #constraint matrix
   }
   
   if(choice == 1)
