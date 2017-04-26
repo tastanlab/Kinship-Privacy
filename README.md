@@ -5,9 +5,9 @@ hide_snps code generates kinship and outlier constraints. It can solve the optim
 These cases are denoted as choice variable and it is the first input paremeter to run the code:
 #### If choice = 0:
 Solve the problem where outlier constraints are relaxed and kinship constraints are satisfied. (This is linear integer programming problem). Also minimize slack variables (quantity of being outliers.) 
-When choice = 0, run the code with following input parameters:
-Rscript hide_snps.r 0 27300 27454 15019
-The last three parameters denote outlier values o10,o11,o12 found in the population.
+When choice = 0, run the code with following input parameters:__
+Rscript hide_snps.r 0 27300 27454 15019__
+The last three parameters denote outlier values o10,o11,o12 found in the population.__
 #### If choice = 1:
 Solution is based on relaxing kinship constraints and satisfying outlier constraints. It generates constraints to find optimal phi value. (This is a non-linear constrained integer problem). These constraints are used in Matlab (See [Solution for choice = 1](https://github.com/tastanlab/Kinship-Privacy/blob/master/README.md#solution-for-choice--1) )
 No extra parameters are needed to run this case:
