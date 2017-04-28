@@ -21,13 +21,14 @@ No extra parameters are needed to run this case:
 ```shell
 Rscript hide_snps.r 1  
 ```
+which outputs _phi.txt_ , _size_constraints.txt_ ,  _kin_constraints.txt_.  
+_optimal_phi.m_ solves the optimization model with non-linear constraints. Here, the objective function is phi and the aim is to find the minimum kinship value that protects privacy of a family by satisfying outlier constraints. After running this code, _hide_snps.r_ can be run as choice = 2.
+
 ### If choice = 2:
 Solve the original problem by replacing optimal phi value found in the previous step. (This is linear integer programming problem). 
 This case requires only one extra parameter; Phi. i.e. 0.07:  
 ```shell
 Rscript hide_snps.r 2 0.07  
 ```
-### Solution for choice = 1
-_optimal_phi.m_ solves the optimization model with non-linear constraints. The objective function is phi (the minimum kinship value that protects privacy of a family by satisfying outlier constraints.) 
 ## Finding families in the Genomic Database
 _hierclustering_opensnp.r_ applies hierchical clustering on opensnp data (VCF format). (See [SNPRelate](http://corearray.sourceforge.net/tutorials/SNPRelate/) )
