@@ -1,7 +1,6 @@
 function [x,fval, exitflag] = ga_lp2()
 
-phi = 0; % it might be higher values i.e. if previous members are added,
-%and the optimal solution is found when phi=0.07, then assign 0.07
+phi = dlmread('phi.txt','',0,0) #the maximum phi value found among family members before adding the newest member
 M = dlmread('kin_constraints.txt','', 0,0 )  ;
 s = (size(M,2)-2)/2;
 
