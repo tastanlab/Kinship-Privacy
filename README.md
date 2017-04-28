@@ -30,9 +30,9 @@ This case requires only one extra parameter; Phi. i.e. 0.07:
 ```shell
 Rscript hide_snps.r 2 0.07  
 ```
-## You have to install:  
-([SNPRelate](http://corearray.sourceforge.net/tutorials/SNPRelate/)).  
-
+### You should have:
+[Rcplex](https://cran.r-project.org/web/packages/Rcplex/index.html), [Bioconductor](https://www.bioconductor.org) packages gdsfmt and [SNPRelate](http://corearray.sourceforge.net/tutorials/SNPRelate/) under R and
+[Global optimization toolbox](https://www.mathworks.com/products/global-optimization.html) under Matlab
 
 
 ## Finding families in the Genomic Database
