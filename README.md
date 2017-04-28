@@ -1,8 +1,8 @@
 
 # A Utility Maximizing and Privacy Preserving Approach for Protecting Kinhsip in Genomic Databases
 Assuming that family members arrive to the database in a sequential time order, a family f wants to hide their familial relationships while sharing their genomic data at the same time. We achieve this through minimizing privacy risks we have identified. There are two types of privacy risks that might reveal kinship information:
-#### Being outliers in the population
-#### Having a kinship coefficient > 0
+#### 1.Being outliers in the population
+#### 2.Having a kinship coefficient > 0
   
 hide_snps.r code transform the problem into an optimization model by generating kinship and outlier constraints. However, in general there is not a solution that satisfies two types privacy risks. Therefore, we have developed a solution while satisfying one type of constraints and relaxing the other one. To achieve sharing maximum amount of data, the objective function is the minimum number of snsp to be hidden.  
   
