@@ -7,10 +7,10 @@ Assuming that family members arrive to the database in a sequential time order, 
 _hide_snps.r_ code transform the problem into an optimization model by generating kinship and outlier constraints. However, in general there is not a solution that satisfies two types privacy risks. Therefore, we have developed a solution while satisfying one type of constraints and relaxing the other one. To achieve sharing maximum amount of data, the objective function is the minimum number of snsp to be hidden.  
   
 hide_snps.r code solves the optimization model if outlier constraints are relaxed. Unfortunately, if kinship constraints are relaxed, those constraints become non-linear and Rcplex cannot solve non-linear constrainted integer programming problems, when the solution is based on relaxing kinship constraints, hide_snps.r only generates the constraints and writes to txt files. Then, _ga_lp2.m_ Matlab code is used to find minimum phi value that satisfies given non-linear constraints. After replacing the optimal phi value into non_linear kinship constraints, the model becomes non-linear and it is available to be solved by Rcplex.   
-These cases are denoted as choice variable and it is the first input paremeter to run the code:
+These cases are denoted as _choice_ variable and it is the first input paremeter to run the code:
 ### If choice = 0:
 Solve the problem where outlier constraints are relaxed and kinship constraints are satisfied. (This is linear integer programming problem). Also it minimizes slack variables (quantity of being outliers.) 
-When choice = 0, run the code with following input parameters:  
+When choice = 0, there are 3 more parameters needed:
 ```shell
 Rscript hide_snps.r 0 o10 o11 o12
 ```
@@ -18,10 +18,12 @@ Note that the initial outlier values found in the population are: o10 = 27300, o
 ### If choice = 1:
 Solution is based on relaxing kinship constraints and satisfying outlier constraints. It generates constraints to find optimal phi value. (This is a non-linear constrained integer problem). These constraints are used in Matlab (See [Solution for choice = 1](https://github.com/tastanlab/Kinship-Privacy/blob/master/README.md#solution-for-choice--1) )
 No extra parameters are needed to run this case:  
+```shell
 Rscript hide_snps.r 1  
+```
 ### If choice = 2:
 Solve the original problem by replacing optimal phi value found in the previous step. (This is linear integer programming problem). 
-This case requires only one external parameter; Phi. i.e. 0.07:  
+This case requires only one extra parameter; Phi. i.e. 0.07:  
 ```shell
 Rscript hide_snps.r 2 0.07  
 ```
