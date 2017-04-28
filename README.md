@@ -28,6 +28,6 @@ This case requires only one extra parameter; Phi. i.e. 0.07:
 Rscript hide_snps.r 2 0.07  
 ```
 ### Solution for choice = 1
-_ga_lp2.m_ solves the optimization model with non-linear constraints. The objective function is phi (the minimum kinship value that protects privacy of a family by satisfying outlier constraints.) 
+_optimal_phi.m_ solves the optimization model with non-linear constraints. The objective function is phi (the minimum kinship value that protects privacy of a family by satisfying outlier constraints.) 
 ## Finding families in the Genomic Database
 _hierclustering_opensnp.r_ applies hierchical clustering on opensnp data (VCF format). (See [SNPRelate](http://corearray.sourceforge.net/tutorials/SNPRelate/) )
