@@ -23,7 +23,7 @@ Rscript hide_snps.r 1
 Solve the original problem by replacing optimal phi value found in the previous step. (This is linear integer programming problem). 
 This case requires only one external parameter; Phi. i.e. 0.07:  
 ```shell
-Rscript hide_snps.r 0 2 0.07  
+Rscript hide_snps.r 2 0.07  
 ```
 ### Solution for choice = 1
 _ga_lp2.m_ solves the optimization model with non-linear constraints. The objective function is phi (the minimum kinship value that protects privacy of a family by satisfying outlier constraints.) 
