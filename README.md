@@ -1,9 +1,15 @@
 
 ## A Utility Maximizing and Privacy Preserving Approach for Protecting Kinhsip in Genomic Databases
-hide_snps code generates kinship and outlier constraints. It can solve the optimization model if outlier constraints are relaxed.  If kinship constraints are relaxed, those constraints become non-linear. Unfortunately, Rcplex cannot solve non-linear constrainted integer programming problems, so this R code only generates the constraints and writes to txt files and then ga_lp2.m code is used to find minimum phi value that satisfies given non-linear constraints. We replace the optimal phi value into non_linear kinship constraints and make them linear. When the problem becomes linear with found phi value, we can solve original problem in Rcplex.
+Assuming that family members arrive to the database in a sequential time order, a family f wants to hide their familial relationships while sharing their genomic data at the same time. We achieve this through minimizing privacy risks we have identified. There are two types of privacy risks that might reveal kinship information:
+#### Being outliers in the population
+#### Having a kinship coefficient > 0
+  
+hide_snps.r code transform the problem into an optimization model by generating kinship and outlier constraints. However, in general there is not a solution that satisfies two types privacy risks. Therefore, we have developed a solution while satisfying one type of constraints and relaxing the other one. To achieve sharing maximum amount of data, the objective function is the minimum number of snsp to be hidden.  
+  
+hide_snps.r code solves the optimization model if outlier constraints are relaxed. Unfortunately, if kinship constraints are relaxed, those constraints become non-linear and Rcplex cannot solve non-linear constrainted integer programming problems, when the solution is based on relaxing kinship constraints, hide_snps.r only generates the constraints and writes to txt files. Then, ga_lp2.m Matlab code is used to find minimum phi value that satisfies given non-linear constraints. After replacing the optimal phi value into non_linear kinship constraints, the model becomes non-linear and it is available to be solved by Rcplex.   
 These cases are denoted as choice variable and it is the first input paremeter to run the code:
 #### If choice = 0:
-Solve the problem where outlier constraints are relaxed and kinship constraints are satisfied. (This is linear integer programming problem). Also minimize slack variables (quantity of being outliers.) 
+Solve the problem where outlier constraints are relaxed and kinship constraints are satisfied. (This is linear integer programming problem). Also it minimizes slack variables (quantity of being outliers.) 
 When choice = 0, run the code with following input parameters:  
 Rscript hide_snps.r 0 27300 27454 15019  
 The last three parameters denote outlier values o10,o11,o12 found in the population.  
