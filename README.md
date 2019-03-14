@@ -1,5 +1,5 @@
 
-# A Utility Maximizing and Privacy Preserving Approach for Protecting Kinhsip in Genomic Databases
+# A Utility Maximizing and Privacy Preserving Approach for Protecting Kinship in Genomic Databases
 Assuming that family members arrive to the database in a sequential time order, a family f wants to hide their familial relationships while sharing their genomic data at the same time. We achieve this through minimizing privacy risks we have identified. There are two types of privacy risks that might reveal kinship information:
 1. Being outliers in the population  
 2. Having a kinship coefficient > 0 
